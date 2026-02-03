@@ -4,8 +4,10 @@ from typing import Dict, Any
 
 try:
     from llama_cpp import Llama
-except ImportError as e:
-    raise ImportError("llama-cpp-python is required. Install with: pip install llama-cpp-python>=0.2.90") from e
+    LLAMA_CPP_AVAILABLE = True
+except ImportError:
+    Llama = None
+    LLAMA_CPP_AVAILABLE = False
 
 def safe_json_extract(text: str) -> Dict[str, Any]:
     text = text.strip()
@@ -28,6 +30,9 @@ class LLMEngine:
         self._init()
 
     def _init(self):
+        if not LLAMA_CPP_AVAILABLE:
+            raise ImportError("llama-cpp-python is required. Install with: pip install llama-cpp-python>=0.2.90")
+        
         if not self.model_path:
             raise ValueError("LLM model path is required. Please configure llm_model_path in config.")
         if not os.path.exists(self.model_path):
