@@ -6,14 +6,17 @@ import sys
 import os
 from typing import Dict, Any
 
+# Mock model path constant for testing
+MOCK_MODEL_PATH = "MOCK_MODEL"
+
 # Mock LLM for testing
 class MockLLMEngine:
     def __init__(self, model_path: str, n_ctx: int, n_threads: int):
         if not model_path:
             raise ValueError("LLM model path is required. Please configure llm_model_path in config.")
         if not os.path.exists(model_path):
-            # For testing, we'll allow a mock path
-            if model_path != "MOCK_MODEL":
+            # For testing, we'll allow the mock path
+            if model_path != MOCK_MODEL_PATH:
                 raise FileNotFoundError(f"LLM model not found at: {model_path}")
         
         self.model_path = model_path
@@ -67,7 +70,7 @@ def test_coach_with_mock_llm():
     from app.coach.coach import Coach
     
     # Create mock dependencies
-    llm = MockLLMEngine("MOCK_MODEL", 2048, 4)
+    llm = MockLLMEngine(MOCK_MODEL_PATH, 2048, 4)
     embedder = MockEmbedder()
     translator = MockTranslator()
     docstore = MockDocStore(embedder)

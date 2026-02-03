@@ -41,7 +41,7 @@ Este proyecto requiere Qwen 0.5B Instruct en formato GGUF.
 - Descarga el modelo desde Hugging Face: https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF
 - Elige una variante (recomendado: `qwen2.5-0.5b-instruct-q4_k_m.gguf` para balance entre velocidad y calidad)
 - Configura la ruta en Configuración → Funciones → LLM
-- El sistema NO usa plantillas hardcodeadas ni lógica if-else, todo es generado por el LLM
+- El sistema NO usa plantillas fijas ni lógica if-else, todo es generado por el LLM
 
 ## 4) Atajos
 - **F8**: toggle click-through (si quieres interactuar con el overlay).

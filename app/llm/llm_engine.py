@@ -5,7 +5,7 @@ from typing import Dict, Any
 try:
     from llama_cpp import Llama
     LLAMA_CPP_AVAILABLE = True
-except ImportError:
+except (ImportError, ModuleNotFoundError) as e:
     Llama = None
     LLAMA_CPP_AVAILABLE = False
 

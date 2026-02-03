@@ -166,9 +166,11 @@ def test_readme():
     else:
         failures.append("❌ README doesn't mention Qwen 0.5")
     
-    if 'opcional' in content.lower() and 'llm' in content.lower():
-        # Check context
-        if 'REQUERIDO' in content or 'requerido' in content:
+    # Check if LLM is marked as optional (in Spanish or English)
+    # README is in Spanish, so we check for 'opcional' primarily
+    if ('opcional' in content.lower() or 'optional' in content.lower()) and 'llm' in content.lower():
+        # Check context to see if it's marked as required
+        if 'REQUERIDO' in content or 'requerido' in content or 'required' in content.upper():
             print("✓ README indicates LLM is required")
         else:
             failures.append("⚠ README may still say LLM is optional")
