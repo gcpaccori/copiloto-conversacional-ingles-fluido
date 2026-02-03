@@ -75,6 +75,16 @@ Sistema validado en CPU sin GPU. Ver [PERFORMANCE.md](PERFORMANCE.md) para resul
 
 ✅ **Apto para conversaciones en tiempo real**
 
+### 📋 Características Completas
+
+Ver [FEATURES_ES.md](FEATURES_ES.md) para documentación completa en español sobre:
+- ✅ Pruebas de rendimiento del flujo completo (audio → transcripción → respuesta)
+- ✅ Manejo de preguntas largas y complejas (hasta 15+ segundos)
+- ✅ Tiempos de respuesta verificados (< 2 segundos)
+- ✅ Configuración de contexto inicial personalizado (profile + goal)
+- ✅ Carga de documentos PDF (niveles de inglés, técnicas, vocabulario)
+- ✅ Funcionalidad completa como copiloto conversacional
+
 ## 📁 Estructura del Proyecto
 
 ```
@@ -116,12 +126,14 @@ pip install -r requirements-optional.txt
 ### Ejecutar tests
 
 ```bash
-# Verificar configuración del sistema
-python verify_asr_config.py
+# Verificación rápida (sin descargar modelos)
+python test_quick_verification.py
 
-# Test de descarga y rendimiento
-python test_real_performance.py
+# Test de rendimiento completo (descarga modelos automáticamente)
+python test_full_performance.py
 ```
+
+Ver [TESTING.md](TESTING.md) para guía completa de testing.
 
 ## 📝 Notas Técnicas
 

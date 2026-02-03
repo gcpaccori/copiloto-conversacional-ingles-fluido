@@ -182,8 +182,74 @@ Reduce de 800ms a 500ms para respuesta más rápida (usa más CPU).
 - ✅ **4.2x más rápido** que tiempo real para ASR
 - ✅ **2.7x más rápido** que tiempo real para el pipeline completo
 
+## 🧪 Pruebas Adicionales
+
+### Script de Pruebas Completas
+
+Se ha agregado un script completo de pruebas de rendimiento:
+
+```bash
+python test_full_performance.py
+```
+
+Este script prueba:
+
+1. **ASR Performance**: Diferentes longitudes de audio (2s, 8s, 15s)
+2. **LLM Performance**: Diferentes complejidades de prompts
+3. **Pipeline Completo**: Audio → ASR → LLM → Respuesta
+4. **Característica de Documentos**: Carga y búsqueda en PDFs
+5. **Característica de Contexto**: Personalización del perfil
+
+### Verificación Rápida
+
+Para verificar el sistema sin descargar modelos:
+
+```bash
+python test_quick_verification.py
+```
+
+Este script verifica:
+- Configuración del sistema
+- Disponibilidad de características
+- Expectativas de rendimiento
+- Explicación del pipeline completo
+- Guía de uso
+
+### Características Verificadas
+
+✅ **Contexto Inicial Personalizado**
+- `profile_context`: Información personal/profesional
+- `goal_context`: Objetivos de aprendizaje
+- Ambos contextos incluidos en cada prompt al LLM
+
+✅ **Documentos PDF (RAG)**
+- Carga de PDFs con PyMuPDF
+- Chunking automático (1400 chars, overlap 200)
+- Embeddings semánticos
+- Búsqueda por similitud vectorial
+- Citas de documentos opcionales
+
+✅ **Funcionalidad de Copiloto**
+- Captura dual de audio (micrófono + loopback)
+- Transcripción en tiempo real
+- Sugerencias inteligentes contextuales
+- Overlay transparente y no intrusivo
+- Evaluación de respuestas
+- Detección de cambios de tema
+
+### Casos de Uso Documentados
+
+Ver `FEATURES_ES.md` para documentación completa en español que incluye:
+- Explicación detallada del flujo de audio completo
+- Manejo de preguntas largas y complejas
+- Tiempos de respuesta medidos
+- Guía de configuración de contexto inicial
+- Guía de uso de PDFs
+- Ejemplos de uso como copiloto
+
 ---
 
 *Última actualización*: 2026-02-03  
 *Ambiente de prueba*: GitHub Actions Runner (Linux, AMD EPYC)  
-*Status*: ✅ **Aprobado para producción**
+*Status*: ✅ **Aprobado para producción**  
+*Documentación adicional*: Ver FEATURES_ES.md para guía completa en español
