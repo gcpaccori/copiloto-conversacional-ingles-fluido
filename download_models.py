@@ -52,14 +52,16 @@ def download_asr():
     try:
         from faster_whisper import WhisperModel
         import time
+        import os
         
         start = time.time()
         print("\n📥 Descargando desde HuggingFace...")
-        print("   Modelo: tiny.en")
+        print("   Repo: Systran/faster-whisper-tiny.en")
         print("   (Esto puede tomar 30s-2min dependiendo de tu conexión)\n")
         
+        # Download to default cache, will use HuggingFace repos
         model = WhisperModel(
-            "tiny.en",
+            "Systran/faster-whisper-tiny.en",
             device="cpu",
             compute_type="int8",
             download_root=None  # Usa cache por defecto
@@ -72,11 +74,21 @@ def download_asr():
         return True
         
     except Exception as e:
+        error_msg = str(e)
         print(f"\n❌ Error descargando ASR: {e}")
+        
+        # Check for blocked domain
+        if "No address associated with hostname" in error_msg or "ConnectError" in error_msg:
+            print("\n🚫 DOMAIN BLOCKED:")
+            print("   The download failed due to network restrictions.")
+            print("   Please ensure huggingface.co and cdn-lfs.huggingface.co are accessible.")
+        
         print("\n💡 Sugerencias:")
         print("   • Verifica tu conexión a internet")
+        print("   • Verifica que huggingface.co esté accesible")
         print("   • Intenta de nuevo")
-        print("   • El modelo se descarga automáticamente al usar WhisperModel()")
+        print("   • O descarga manualmente desde:")
+        print("     https://huggingface.co/Systran/faster-whisper-tiny.en")
         return False
 
 def main():

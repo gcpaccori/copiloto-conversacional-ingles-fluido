@@ -118,10 +118,11 @@ def test_asr_download_and_speed():
         from faster_whisper import WhisperModel
         
         print("\n📥 Descargando modelo Whisper tiny.en...")
+        print("   Repo: Systran/faster-whisper-tiny.en")
         
         download_start = time.time()
         model = WhisperModel(
-            "tiny.en",
+            "Systran/faster-whisper-tiny.en",
             device="cpu",
             compute_type="int8",
             cpu_threads=os.cpu_count() or 4,
@@ -227,7 +228,7 @@ def test_full_pipeline():
         print("\n📦 Cargando modelos (desde cache)...")
         
         load_start = time.time()
-        asr_model = WhisperModel("tiny.en", device="cpu", compute_type="int8", 
+        asr_model = WhisperModel("Systran/faster-whisper-tiny.en", device="cpu", compute_type="int8", 
                                  cpu_threads=os.cpu_count() or 4, num_workers=1)
         asr_load_time = time.time() - load_start
         print(f"✅ ASR cargado en {asr_load_time:.2f}s")

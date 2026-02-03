@@ -50,7 +50,10 @@ def verify_asr_implementation():
         print(f"   • Modelo: {model_size}")
         print(f"   • Compute type: {compute_type}")
         
-        if model_size == "tiny.en":
+        # Check if it's the tiny.en model (either repo ID or short name)
+        is_tiny_en = model_size in ["tiny.en", "Systran/faster-whisper-tiny.en"]
+        
+        if is_tiny_en:
             print("   ✅ tiny.en es ÓPTIMO para tiempo real")
             results.append(("Modelo correcto (tiny.en)", True))
         else:
