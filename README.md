@@ -126,12 +126,14 @@ pip install -r requirements-optional.txt
 ### Ejecutar tests
 
 ```bash
-# Verificar configuración del sistema
-python verify_asr_config.py
+# Verificación rápida (sin descargar modelos)
+python test_quick_verification.py
 
-# Test de descarga y rendimiento
-python test_real_performance.py
+# Test de rendimiento completo (descarga modelos automáticamente)
+python test_full_performance.py
 ```
+
+Ver [TESTING.md](TESTING.md) para guía completa de testing.
 
 ## 📝 Notas Técnicas
 
