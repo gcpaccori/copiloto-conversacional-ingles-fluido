@@ -20,7 +20,9 @@ class ASREngine:
         try:
             self.model = WhisperModel(self.model_size, device="cpu", compute_type=self.compute_type)
             self.ready = True
-        except Exception:
+        except Exception as e:
+            import sys
+            print(f"Warning: Failed to initialize Whisper model '{self.model_size}': {e}", file=sys.stderr)
             self.ready = False
 
     def transcribe(self, audio_f32: np.ndarray) -> str:
