@@ -75,6 +75,16 @@ Sistema validado en CPU sin GPU. Ver [PERFORMANCE.md](PERFORMANCE.md) para resul
 
 ✅ **Apto para conversaciones en tiempo real**
 
+### 📋 Características Completas
+
+Ver [FEATURES_ES.md](FEATURES_ES.md) para documentación completa en español sobre:
+- ✅ Pruebas de rendimiento del flujo completo (audio → transcripción → respuesta)
+- ✅ Manejo de preguntas largas y complejas (hasta 15+ segundos)
+- ✅ Tiempos de respuesta verificados (< 2 segundos)
+- ✅ Configuración de contexto inicial personalizado (profile + goal)
+- ✅ Carga de documentos PDF (niveles de inglés, técnicas, vocabulario)
+- ✅ Funcionalidad completa como copiloto conversacional
+
 ## 📁 Estructura del Proyecto
 
 ```
