@@ -1,60 +1,158 @@
-\
-# Copiloto conversacional (PC) — MVP
+# Copiloto Conversacional en Inglés Fluido
 
-Este mini‑repo crea un **copiloto conversacional en tiempo real** para PC (Windows), pensado para:
-- Ella por **Microsoft Teams/Meetings** (audio del sistema / loopback).
-- Tú por **micrófono**.
-- ASR en vivo (inglés) + sugerencias "SAY NOW".
-- Evaluación de tu respuesta vs sugerencia.
-- Traducción opcional EN→ES (lo que dice ella).
-- PDF opcional como fuente (RAG) activable/desactivable.
-- Overlay **casi invisible** + ventana de configuración visible.
-- Overlay **click‑through** (no estorba el mouse).
+Sistema de conversación en tiempo real con IA para practicar inglés, optimizado para CPU.
 
-> Nota: Capturar audio del sistema depende de WASAPI loopback. Si tu PC no lo permite, usa "Stereo Mix" o un driver virtual (VB‑Cable).
+## 🎯 Características
 
-## 1) Instalación rápida (PowerShell)
+- **ASR en Tiempo Real**: Transcripción de audio usando Whisper (faster-whisper)
+- **LLM Local**: Sugerencias conversacionales con Qwen 0.5B
+- **Optimizado para CPU**: No requiere GPU, funciona en hardware común
+- **Doble Captura**: Micrófono (tu voz) + Loopback (audio del sistema)
+- **Overlay Transparente**: Interfaz no intrusiva con sugerencias en pantalla
+
+## 🚀 Instalación Rápida
+
+### Requisitos
+- Python 3.8+
+- Windows 10/11 (para captura de audio WASAPI)
+- 4GB RAM mínimo, 8GB recomendado
+- CPU de 4 núcleos o más
+
+### Instalación
+
 ```powershell
-cd .\copiloto_pc
-.\scripts\setup.ps1
+# Clonar repositorio
+git clone https://github.com/gcpaccori/copiloto-conversacional-ingles-fluido.git
+cd copiloto-conversacional-ingles-fluido
+
+# Crear entorno virtual e instalar dependencias
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
-Esto crea `.\.venv`, instala dependencias base y deja un comando para correr.
+### Modelos Requeridos
 
-## 2) Ejecutar
+Los modelos se descargan automáticamente desde HuggingFace la primera vez:
+
+**ASR (Whisper tiny.en)**
+- Se descarga automáticamente de `Systran/faster-whisper-tiny.en`
+- Tamaño: ~75MB
+
+**LLM (Qwen 0.5B)**
+- Se descarga automáticamente de `Qwen/Qwen2.5-0.5B-Instruct-GGUF`
+- Archivo: `qwen2.5-0.5b-instruct-q4_k_m.gguf`
+- Tamaño: ~491MB
+
+## ▶️ Uso
+
 ```powershell
-.\scripts\run.ps1
+# Ejecutar la aplicación
+python app/main.py
 ```
 
-Se abre la ventana de configuración:
-1) Elige tu **Micrófono** (tu voz).
-2) Elige **Loopback**: el dispositivo de salida donde escuchas Teams (audífonos/altavoces).
-3) ASR model: empieza con `tiny.en`.
-4) Guarda y aplica.
+### Configuración Inicial
 
-## 3) Modelos
-### ASR (Whisper)
-`faster-whisper` descargará el modelo la primera vez (requiere internet) a menos que lo caches.
+1. Selecciona tu **micrófono** (tu voz)
+2. Selecciona **Loopback** (audio del sistema - Teams/Zoom/etc)
+3. El sistema descargará los modelos automáticamente
+4. ¡Listo para usar!
 
-### LLM (REQUERIDO - Qwen 0.5B)
-Este proyecto requiere Qwen 0.5B Instruct en formato GGUF. 
-- Descarga el modelo desde Hugging Face: https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF
-- Elige una variante (recomendado: `qwen2.5-0.5b-instruct-q4_k_m.gguf` para balance entre velocidad y calidad)
-- Configura la ruta en Configuración → Funciones → LLM
-- El sistema NO usa plantillas fijas ni lógica if-else, todo es generado por el LLM
+### Atajos de Teclado
 
-## 4) Atajos
-- **F8**: toggle click-through (si quieres interactuar con el overlay).
-- **F9**: mostrar/ocultar overlay.
-- **F10**: fijar overlay encima (topmost).
+- **F8**: Alternar click-through del overlay
+- **F9**: Mostrar/ocultar overlay
+- **F10**: Fijar overlay encima (topmost)
 
-(Estos atajos solo usan Tkinter; si no funcionan en tu Windows, puedes moverlos a botones.)
+## 📊 Rendimiento
 
-## 5) Estructura
-- `app/main.py` — orquestador
-- `app/ui/*` — overlay + config
-- `app/audio/*` — captura + VAD/segmentos
-- `app/asr/*` — faster-whisper
-- `app/coach/*` — lógica de sugerencias + evaluación
-- `app/rag/*` — PDF chunking + búsqueda
-- `scripts/*` — setup / run
+Sistema validado en CPU sin GPU. Ver [PERFORMANCE.md](PERFORMANCE.md) para resultados detallados.
+
+**Velocidades Medidas (CPU AMD EPYC 7763, 4 cores):**
+- ASR: ~316ms por transcripción (RTF 0.24x)
+- LLM: ~294ms por respuesta
+- Pipeline completo: ~924ms
+
+✅ **Apto para conversaciones en tiempo real**
+
+## 📁 Estructura del Proyecto
+
+```
+copiloto-conversacional-ingles-fluido/
+├── app/
+│   ├── main.py              # Punto de entrada
+│   ├── audio/               # Captura y procesamiento de audio
+│   ├── asr/                 # Motor de transcripción (Whisper)
+│   ├── llm/                 # Motor LLM (Qwen)
+│   ├── coach/               # Lógica de sugerencias
+│   ├── ui/                  # Interfaz de usuario
+│   └── utils/               # Utilidades
+├── scripts/                 # Scripts de instalación
+├── config.default.json      # Configuración por defecto
+└── requirements.txt         # Dependencias Python
+```
+
+## 🔧 Configuración Avanzada
+
+Edita `config.json` (se crea en primera ejecución) para ajustar:
+
+```json
+{
+  "asr_model_size": "Systran/faster-whisper-tiny.en",
+  "asr_compute_type": "int8",
+  "llm_model_path": "",
+  "sample_rate": 16000
+}
+```
+
+## 🛠️ Desarrollo
+
+### Instalar dependencias de desarrollo
+
+```bash
+pip install -r requirements-optional.txt
+```
+
+### Ejecutar tests
+
+```bash
+# Verificar configuración del sistema
+python verify_asr_config.py
+
+# Test de descarga y rendimiento
+python test_real_performance.py
+```
+
+## 📝 Notas Técnicas
+
+- **ASR**: Usa `faster-whisper` con modelo `tiny.en` + cuantización INT8
+- **LLM**: Usa `llama-cpp-python` con modelo Qwen Q4_K_M
+- **VAD**: Usa `webrtcvad` para detección de voz
+- **Audio**: Captura WASAPI en Windows
+
+### Optimizaciones Implementadas
+
+- Beam size = 1 (greedy decoding)
+- Sin timestamps en transcripción
+- Cuantización INT8 para ASR
+- Cuantización Q4_K_M para LLM
+- Threads automáticos según CPU
+
+## 🤝 Contribuir
+
+Las contribuciones son bienvenidas. Por favor:
+1. Haz fork del repositorio
+2. Crea una rama para tu feature
+3. Haz commit de tus cambios
+4. Abre un Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo licencia MIT.
+
+## 🙏 Créditos
+
+- **Whisper**: OpenAI
+- **faster-whisper**: SYSTRAN
+- **Qwen**: Alibaba Cloud
+- **llama-cpp-python**: Comunidad llama.cpp
