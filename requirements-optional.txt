@@ -1,0 +1,4 @@
+# Optional (better topic tracking + offline translation + local LLM)
+sentence-transformers>=2.7.0
+llama-cpp-python>=0.2.90
+argostranslate>=1.9.1

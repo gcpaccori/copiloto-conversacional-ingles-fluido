@@ -1,0 +1,21 @@
+{
+  "sample_rate": 16000,
+  "mic_device": null,
+  "loopback_device": null,
+  "asr_model_size": "tiny.en",
+  "asr_compute_type": "int8",
+  "enable_translation": false,
+  "enable_document": false,
+  "cite_document": true,
+  "pdf_path": "",
+  "llm_model_path": "",
+  "llm_ctx": 2048,
+  "llm_threads": 4,
+  "overlay_alpha": 0.28,
+  "overlay_font_size": 18,
+  "overlay_pos_x": 80,
+  "overlay_pos_y": 80,
+  "overlay_click_through": true,
+  "profile_context": "My name is Gabriel. I work in IT / Cloud / IoT.",
+  "goal_context": "Have a smooth professional conversation in English."
+}
