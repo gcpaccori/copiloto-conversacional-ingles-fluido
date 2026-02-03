@@ -2,7 +2,7 @@
   "sample_rate": 16000,
   "mic_device": null,
   "loopback_device": null,
-  "asr_model_size": "tiny.en",
+  "asr_model_size": "Systran/faster-whisper-tiny.en",
   "asr_compute_type": "int8",
   "enable_translation": false,
   "enable_document": false,

@@ -1,5 +1,6 @@
 import os
 import queue
+import time
 import tkinter as tk
 
 import sounddevice as sd
@@ -133,7 +134,6 @@ class App:
         if source == "her":
             if kind == "partial":
                 # throttle partials to keep CPU stable
-                import time
                 t = time.time()
                 if (t - self.last_partial_t) < 0.7:
                     return
