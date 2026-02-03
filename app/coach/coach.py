@@ -34,36 +34,15 @@ class Coach:
         self.last_suggest: Dict[str, Any] = {}
         self.last_her_text = ""
 
-        self.templates = {
-            "ask_experience": "Sure. I’ve worked with cloud services in IoT projects. What would you like to focus on first?",
-            "ask_schedule": "Yes, I’m available. What schedule and time zone overlap do you need?",
-            "clarify": "Got it—could you clarify what you mean by that?",
-            "confirm": "Just to confirm, you mean {x}, right?",
-            "generic": "Understood. What would you like to do next?"
-        }
-
-    def _intent_fast(self, her_text: str) -> str:
-        t = her_text.lower()
-        if any(k in t for k in ["experience", "background", "worked", "project", "built"]):
-            return "ask_experience"
-        if any(k in t for k in ["schedule", "available", "availability", "time zone", "timezone", "hours"]):
-            return "ask_schedule"
-        if any(k in t for k in ["clarify", "mean", "explain", "what do you mean"]):
-            return "clarify"
-        if "?" in t:
-            return "generic"
-        return "generic"
-
     def _update_topic(self, text: str):
         v = self.embedder.encode(text)
         if v is not None:
             self.topic_vec = v
 
     def _topic_shift(self, me_text: str) -> bool:
-        # lightweight fallback if no embeddings
+        # Use embeddings for topic shift detection
         if self.topic_vec is None or self.embedder.model is None:
-            t = me_text.lower()
-            return any(x in t for x in ["anyway", "by the way", "also", "another thing"])
+            return False
         a = self.embedder.encode(me_text)
         if a is None:
             return False
@@ -114,20 +93,12 @@ class Coach:
     def suggest_draft(self, her_partial: str) -> Dict[str, Any]:
         if not her_partial.strip():
             return {}
-        intent = self._intent_fast(her_partial)
-        draft = {"say_now": self.templates.get(intent, self.templates["generic"]),
-                 "intent": intent,
-                 "must_include": []}
-
-        doc_ctx = ""
-        if any(k in her_partial.lower() for k in ["according to", "report", "document", "pdf"]):
-            doc_ctx = self._maybe_retrieve_doc(her_partial)
-
-        if self.llm.ready:
-            out = self.llm.generate_json(self._system_prompt(), self._build_user_prompt(her_partial, "", doc_ctx), max_tokens=70)
-            if out.get("say_now"):
-                return out
-        return draft
+        
+        doc_ctx = self._maybe_retrieve_doc(her_partial)
+        
+        # Always use LLM, no fallback templates
+        out = self.llm.generate_json(self._system_prompt(), self._build_user_prompt(her_partial, "", doc_ctx), max_tokens=70)
+        return out
 
     def suggest_final(self, her_final: str) -> Dict[str, Any]:
         if not her_final.strip():
@@ -136,21 +107,12 @@ class Coach:
         self.history.append(("her", her_final))
         self._update_topic(her_final)
 
-        intent = self._intent_fast(her_final)
-        fallback = {"say_now": self.templates.get(intent, self.templates["generic"]),
-                    "intent": intent,
-                    "must_include": []}
-
         doc_ctx = self._maybe_retrieve_doc(her_final)
 
-        if self.llm.ready:
-            out = self.llm.generate_json(self._system_prompt(), self._build_user_prompt(her_final, "", doc_ctx), max_tokens=90)
-            if out.get("say_now"):
-                self.last_suggest = out
-                return out
-
-        self.last_suggest = fallback
-        return fallback
+        # Always use LLM, no fallback templates
+        out = self.llm.generate_json(self._system_prompt(), self._build_user_prompt(her_final, "", doc_ctx), max_tokens=90)
+        self.last_suggest = out
+        return out
 
     def evaluate_me(self, me_final: str) -> Dict[str, Any]:
         if not me_final.strip():
@@ -173,11 +135,13 @@ class Coach:
             status = "missing_slots"
             notes.append("Missing: " + ", ".join(missing))
 
-        # provide bridge suggestion if topic shift
+        # provide bridge suggestion using LLM if topic shift
         suggest = {}
         if status == "topic_shift":
-            last = (self.last_suggest.get("say_now") or "").strip()
-            bridge = ("Before we switch topics, just to wrap up: " + last[:140]).strip()
-            suggest = {"bridge_now": bridge, "say_now": "Sure—switching topics. What would you like to discuss next?"}
+            # Use LLM to generate bridge suggestion
+            bridge_prompt = f"Generate a brief bridge phrase to transition from '{self.last_her_text}' to a new topic. Return JSON with bridge_now and say_now keys."
+            bridge_response = self.llm.generate_json(self._system_prompt(), bridge_prompt, max_tokens=60)
+            if bridge_response:
+                suggest = bridge_response
 
         return {"status": status, "notes": notes, "suggest": suggest}
