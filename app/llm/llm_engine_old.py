@@ -4,8 +4,8 @@ from typing import Dict, Any
 
 try:
     from llama_cpp import Llama
-except ImportError as e:
-    raise ImportError("llama-cpp-python is required. Install with: pip install llama-cpp-python>=0.2.90") from e
+except Exception:
+    Llama = None
 
 def safe_json_extract(text: str) -> Dict[str, Any]:
     text = text.strip()
@@ -29,10 +29,11 @@ class LLMEngine:
 
     def _init(self):
         if not self.model_path:
-            raise ValueError("LLM model path is required. Please configure llm_model_path in config.")
+            return
         if not os.path.exists(self.model_path):
-            raise FileNotFoundError(f"LLM model not found at: {self.model_path}")
-        
+            return
+        if Llama is None:
+            return
         try:
             self.llm = Llama(
                 model_path=self.model_path,
@@ -42,13 +43,13 @@ class LLMEngine:
                 verbose=False
             )
             self.ready = True
-        except Exception as e:
-            raise RuntimeError(f"Failed to initialize LLM: {e}")
+        except Exception:
+            self.ready = False
+            self.llm = None
 
     def generate_json(self, system: str, user: str, max_tokens: int = 90) -> Dict[str, Any]:
         if not self.ready or self.llm is None:
-            raise RuntimeError("LLM is not ready. Ensure model is properly loaded.")
-        
+            return {}
         prompt = f"<|system|>\n{system}\n<|user|>\n{user}\n<|assistant|>\n"
         try:
             out = self.llm(
@@ -60,5 +61,5 @@ class LLMEngine:
             )
             text = out["choices"][0]["text"]
             return safe_json_extract(text)
-        except Exception as e:
-            raise RuntimeError(f"Error generating response: {e}")
+        except Exception:
+            return {}

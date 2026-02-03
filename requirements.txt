@@ -3,3 +3,5 @@ sounddevice>=0.4.6
 webrtcvad>=2.0.10
 faster-whisper>=1.0.3
 pymupdf>=1.23.0
+llama-cpp-python>=0.2.90
+sentence-transformers>=2.7.0
