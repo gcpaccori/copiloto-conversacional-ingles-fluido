@@ -18,7 +18,17 @@ class ASREngine:
         if WhisperModel is None:
             return
         try:
-            self.model = WhisperModel(self.model_size, device="cpu", compute_type=self.compute_type)
+            # Optimize for speed: use available CPU threads
+            import os
+            cpu_threads = os.cpu_count() or 4
+            
+            self.model = WhisperModel(
+                self.model_size, 
+                device="cpu", 
+                compute_type=self.compute_type,
+                cpu_threads=cpu_threads,  # Use all available CPU threads
+                num_workers=1             # Single worker for low latency
+            )
             self.ready = True
         except Exception as e:
             import sys
@@ -33,7 +43,12 @@ class ASREngine:
                 audio_f32,
                 language="en",
                 vad_filter=False,
-                beam_size=1
+                beam_size=1,
+                best_of=1,                      # Only use 1 candidate (faster)
+                temperature=0.0,                # Greedy sampling (fastest, deterministic)
+                condition_on_previous_text=False,  # No context dependency (faster)
+                without_timestamps=True,        # Skip timestamp generation (faster)
+                log_progress=False              # No progress logging (faster)
             )
             text = " ".join(seg.text.strip() for seg in segments).strip()
             return text

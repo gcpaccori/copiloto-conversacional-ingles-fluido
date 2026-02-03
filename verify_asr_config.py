@@ -76,21 +76,34 @@ def verify_asr_implementation():
     import inspect
     
     try:
-        source = inspect.getsource(ASREngine.transcribe)
+        transcribe_source = inspect.getsource(ASREngine.transcribe)
+        init_source = inspect.getsource(ASREngine._init)
         
-        checks = [
+        transcribe_checks = [
             ('language="en"', "Idioma especificado"),
             ("vad_filter=False", "VAD interno desactivado"),
             ("beam_size=1", "Beam size mínimo (greedy)"),
+            ("best_of=1", "Best of=1 (sin candidatos múltiples)"),
+            ("temperature=0.0", "Temperature=0.0 (greedy sampling)"),
+            ("condition_on_previous_text=False", "Sin dependencia de contexto"),
+            ("without_timestamps=True", "Sin timestamps (más rápido)"),
         ]
         
-        for code_pattern, description in checks:
-            if code_pattern in source:
+        for code_pattern, description in transcribe_checks:
+            if code_pattern in transcribe_source:
                 print(f"   ✅ {description} ({code_pattern})")
                 results.append((description, True))
             else:
                 print(f"   ❌ FALTA: {description}")
                 results.append((description, False))
+        
+        # Check init optimizations
+        if "cpu_threads" in init_source:
+            print(f"   ✅ CPU threads optimizado (cpu_threads)")
+            results.append(("CPU threads optimizado", True))
+        else:
+            print(f"   ❌ FALTA: CPU threads optimizado")
+            results.append(("CPU threads optimizado", False))
                 
     except Exception as e:
         print(f"   ❌ Error analizando código: {e}")
@@ -145,6 +158,7 @@ def estimate_performance():
     print()
     print("  Modelo          Compute   RTF      Latencia/1s   Tiempo Real")
     print("  " + "-"*60)
+    print("  tiny.en (opt)   int8      0.10-0.25x  100-250ms   🚀 EXCELENTE")
     print("  tiny.en         int8      0.15-0.30x  150-300ms   🚀 EXCELENTE")
     print("  tiny.en         float32   0.25-0.40x  250-400ms   ✅ BUENO")
     print("  base.en         int8      0.40-0.60x  400-600ms   ⚠️  ACEPTABLE")
@@ -155,10 +169,10 @@ def estimate_performance():
     print("📈 Pipeline completo estimado (chunk de 1 segundo):")
     print()
     print("  1. VAD (webrtcvad):           <1ms")
-    print("  2. Transcripción (tiny.en):   ~150-300ms")
+    print("  2. Transcripción (optimizado):~100-250ms")
     print("  3. LLM (Qwen 0.5B):           ~200-500ms")
     print("  " + "-"*60)
-    print("  TOTAL:                        ~350-800ms")
+    print("  TOTAL:                        ~300-750ms")
     print()
     
     print("✅ RTF < 1.0 = Sistema viable en tiempo real")
@@ -218,6 +232,11 @@ def print_recommendations():
     print("   • tiny.en (modelo más rápido)")
     print("   • int8 (cuantización óptima)")
     print("   • beam_size=1 (máxima velocidad)")
+    print("   • best_of=1 (sin candidatos múltiples)")
+    print("   • temperature=0.0 (greedy, determinista)")
+    print("   • condition_on_previous_text=False (sin contexto)")
+    print("   • without_timestamps=True (sin timestamps)")
+    print("   • cpu_threads=auto (todos los cores)")
     print("   • vad_filter=False (VAD externo)")
     print("   • language='en' (sin detección)")
     print()
@@ -286,8 +305,8 @@ def main():
         print()
         print("   • Usa faster-whisper ✓")
         print("   • Usa tiny.en + int8 ✓")
-        print("   • Optimizaciones implementadas ✓")
-        print("   • Velocidad estimada: RTF 0.15-0.30x ✓")
+        print("   • Optimizaciones avanzadas implementadas ✓")
+        print("   • Velocidad estimada: RTF 0.10-0.25x ✓")
         print()
         print("🎯 NO SE REQUIEREN CAMBIOS")
         print("   El sistema YA está optimizado para máxima velocidad en CPU")
