@@ -1,0 +1,5 @@
+numpy
+sounddevice
+webrtcvad
+faster-whisper
+pymupdf
